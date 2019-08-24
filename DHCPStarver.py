@@ -49,5 +49,6 @@ ipRange = netaddr.IPNetwork(network).iter_hosts()
 #for ip in ipRange:
     #makeDHCPRequest(ip, interface)
 
-
+# Futur DHCP server 
+# http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
 
