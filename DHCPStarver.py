@@ -1,10 +1,10 @@
 import netaddr
 import argparse
 from scapy.all import *
+from threading import Thread
 
 
-
-def makeDHCPRequest(ipRequested, interface,nb):
+def makeDHCPRequest(ipRequested, interface, nb, timeOut):
 # Function to craft simple DHCP discover request
     
     conf.checkIPaddr = False
@@ -21,10 +21,17 @@ def makeDHCPRequest(ipRequested, interface,nb):
 
     # Send DHCP discover request through specified interface
     for i in range(nb):
-        answer, nonAnswer = srp(packet,iface = interface, verbose = True)
-    # Print the IP requested by the loop
-    print(f"[+] DHCP discover with {randomMac} mac address")
-    print(answer)
+        answer, unanwser = srp(packet,iface = interface, multi = True, verbose = True, timeout = timeOut)
+        # If an answer is given, quit the for loop
+        # Sometime, Scapy don't receive answer, but Wireshark does...
+        if answer:
+            break
+
+
+    print(answer.display())
+    print(unanwser.display())
+
+
 
     return
 
@@ -38,7 +45,7 @@ network = '10.0.10.0/24'
 # Try/Except to avoid error in network notation
 try:
     netAddress = netaddr.IPNetwork(network,implicit_prefix=False)
-    
+
     # If the network CIDR is greater or equal to 31
     # /31 allow only 2 hosts in the network
     # /32 don't allow any hosts in network...
@@ -52,27 +59,26 @@ except netaddr.AddrFormatError as e:
 
 
 
-
-
-
-
 # Define interface used for dhcp spoofed request
 interface = 'vboxnet0'
-#ip = '172.16.0.200'
 # Number of request by mac address
-nb = 1
+nb = 3
+# Define timeout (in seconds) for each DHCP discover request
+timeOut = 2
 
 
 # Get ip range with netaddr library
 # .iter_host() allow to get only 'hostable' ip
 ipRange = netaddr.IPNetwork(network).iter_hosts()
 
-
 # Simple loop to make DHCP discover request on the IP range
-#for ip in ipRange:
-#    makeDHCPRequest(ip, interface, nb)
-#    break
+for index,ip in enumerate(ipRange):
+    print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
+    makeDHCPRequest(ip, interface, nb)
+    break
 
 # Futur DHCP server 
 # http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
 
+# Sniffer from 
+# https://blog.skyplabs.net/2018/03/01/python-sniffing-inside-a-thread-with-scapy/
