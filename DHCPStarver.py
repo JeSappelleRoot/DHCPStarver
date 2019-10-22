@@ -29,7 +29,7 @@ def makeDHCPRequest(ip, interface):
 # --------------------------------------------------------
 
 # Define a network in CIDR notation
-network = '173.16.0.0/55'
+network = '10.0.10.0/24'
 
 # Check network format to avoid error
 try:
