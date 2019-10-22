@@ -30,8 +30,14 @@ def makeDHCPRequest(ip, interface):
 
 # Define a network in CIDR notation
 network = '173.16.0.0/55'
-if not netaddr.IPNetwork(network).is_private():
-    print("[!] Please specify a private network range")
+
+# Check network format to avoid error
+try:
+    netAddress = netaddr.IPNetwork(network)
+except netaddr.AddrFormatError as e:
+    print("[!] Please specify a valid network address")
+    print(f"[!] {e}")
+    exit()
 
 
 
