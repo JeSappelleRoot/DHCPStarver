@@ -33,9 +33,25 @@ def makeDHCPRequest(ipRequested, interface,nb):
 # --------------------------------------------------------
 
 # Define a network in CIDR notation
-network = '172.16.0.0/24'
-if not netaddr.IPNetwork(network).is_private():
-    print("[!] Please specify a private network range")
+network = '10.0.10.0/24'
+
+# Try/Except to avoid error in network notation
+try:
+    netAddress = netaddr.IPNetwork(network,implicit_prefix=False)
+    
+    # If the network CIDR is greater or equal to 31
+    # /31 allow only 2 hosts in the network
+    # /32 don't allow any hosts in network...
+    if netAddress.prefixlen >= 31:
+        print("[!] Please specify a CIDR lower than 31 or 32")
+        exit()
+except netaddr.AddrFormatError as e:
+    print("[!] Please specify a valid network address : ")
+    print(f"[!] {e}")
+    exit()
+
+
+
 
 
 
@@ -51,10 +67,11 @@ nb = 1
 # .iter_host() allow to get only 'hostable' ip
 ipRange = netaddr.IPNetwork(network).iter_hosts()
 
+
 # Simple loop to make DHCP discover request on the IP range
-for ip in ipRange:
-    makeDHCPRequest(ip, interface, nb)
-    break
+#for ip in ipRange:
+#    makeDHCPRequest(ip, interface, nb)
+#    break
 
 # Futur DHCP server 
 # http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
