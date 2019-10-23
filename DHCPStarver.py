@@ -27,21 +27,21 @@ def makeDHCPRequest(ipRequested, interface, nb, timeOut):
         if answer:
             break
 
+    # If no answer received
     if not answer:
         print("[-] No DHCP offer from a DHCP server...")
+    # Else if we have an answer from a DHCP server
     else:
+        # Loop on the answer, to extract send/receive part
         for snd,rcv in answer:
+            # Extract IP of DHCP server
             ipSrv = rcv.sprintf(r"%IP.src%")
+            # Extract offered IP
+            ipOffer = rcv.sprintf(r"%IP.dst%"))
         
-        #groups = re.search('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
-        #print(groups)
-        print(answer.show())
+        # Regex from D@d@ 
+        # re.findall('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
         
-            
-        
-# Ether / IP / UDP 0.0.0.0:bootpc > 255.255.255.255:bootps / BOOTP / DHCP ==> Ether / IP / UDP 10.0.10.10:bootps > 10.0.10.185:bootpc / BOOTP / DHCP
-
-
     return
 
 # --------------------------------------------------------
