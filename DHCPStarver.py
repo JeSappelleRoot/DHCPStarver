@@ -1,7 +1,7 @@
 import netaddr
 import argparse
 from scapy.all import *
-from threading import Thread
+import re
 
 
 def makeDHCPRequest(ipRequested, interface, nb, timeOut):
@@ -27,10 +27,19 @@ def makeDHCPRequest(ipRequested, interface, nb, timeOut):
         if answer:
             break
 
-
-    print(answer.display())
-    print(unanwser.display())
-
+    if not answer:
+        print("[-] No DHCP offer from a DHCP server...")
+    else:
+        for snd,rcv in answer:
+            ipSrv = rcv.sprintf(r"%IP.src%")
+        
+        #groups = re.search('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
+        #print(groups)
+        print(answer.show())
+        
+            
+        
+# Ether / IP / UDP 0.0.0.0:bootpc > 255.255.255.255:bootps / BOOTP / DHCP ==> Ether / IP / UDP 10.0.10.10:bootps > 10.0.10.185:bootpc / BOOTP / DHCP
 
 
     return
@@ -74,11 +83,11 @@ ipRange = netaddr.IPNetwork(network).iter_hosts()
 # Simple loop to make DHCP discover request on the IP range
 for index,ip in enumerate(ipRange):
     print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
-    makeDHCPRequest(ip, interface, nb)
+    makeDHCPRequest(ip, interface, nb, timeOut)
     break
 
 # Futur DHCP server 
 # http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
 
-# Sniffer from 
-# https://blog.skyplabs.net/2018/03/01/python-sniffing-inside-a-thread-with-scapy/
+# Answer analyzing from 
+# https://0xbharath.github.io/art-of-packet-crafting-with-scapy/scapy/sending_recieving/index.html
