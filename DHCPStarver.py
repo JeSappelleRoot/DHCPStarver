@@ -1,7 +1,8 @@
 import netaddr
 import argparse
+import netifaces
 from scapy.all import *
-import re
+
 
 
 def displayBanner():
@@ -102,12 +103,13 @@ DHCPStarver is a tool to perform a DHCP starvation attack with different modes :
 )
 
 # Add arguments 
-parser.add_argument('mode', help='Specify mode (info/fast/slow)')
-parser.add_argument('-i', help='Interface used to make DHCP discover (e.g eth0)')
-parser.add_argument('-s', help='Specify a subnet with CIDR notation (e.g 192.168.0.0/24)')
-parser.add_argument('-t', help='Specify timeout for each packet (in seconds, default 3)', default=3, type=int)
-parser.add_argument('-r', help='Number of retry for each packet (default 3)', default=3, type=int)
+parser.add_argument('mode', help='Specify mode [info/fast/slow] (Default is fast),', default='fast')
+parser.add_argument('-i', help='Interface used to make DHCP discover (e.g eth0)', required=True)
+parser.add_argument('-s', help='Specify a subnet with CIDR notation (e.g 192.168.0.0/24)',required=True)
+parser.add_argument('-t', help='Specify timeout for each packet (in seconds, default 0)', default=3, type=int)
+parser.add_argument('-r', help='Number of retry for each packet (default 0)', default=0, type=int)
 parser.add_argument('-d', help='Enable scapy debug mode (False if ommited)', action="store_true",default='False')
+
 
 displayBanner()
 
@@ -121,28 +123,25 @@ if len(sys.argv)==1:
     parser.print_help(sys.stderr)
     exit()
 
-
-
-
-if args.r < 1:
-    print("\n[!] Number of retries can't be lower than 1")
-    exit()
-
-
+# Define the mode
+mode = args.mode
 # Define a network in CIDR notation
 subnet = args.s
-
 # Define interface used for dhcp spoofed request
 interface = args.i
-
 # Number of request by mac address
 nb = args.r
-
 # Define timeout (in seconds) for each DHCP discover request
 timeOut = args.t
-
 # Define a debug variable for Scapy
 debug = args.d
+
+
+
+# Check if interface exist in the host
+if interface not in netifaces.interfaces():
+    print(f"[!] Interface {interface} don't exist")
+    exit()
 
 
 # Try/Except to avoid error in network notation
@@ -166,15 +165,19 @@ except netaddr.AddrFormatError as e:
 # ------------------------- Main -------------------------
 # --------------------------------------------------------
 
+# Answer analyzing from 
+# https://0xbharath.github.io/art-of-packet-crafting-with-scapy/scapy/sending_recieving/index.html
+
+# Thanks for D@D@ from Montpellier for his regex
 
 
 # Get ip range with netaddr library
 # .iter_host() allow to get only 'hostable' ip
 ipRange = netaddr.IPNetwork(subnet).iter_hosts()
 
-
 # Simple loop to make DHCP discover request on the IP range
-#for index,ip in enumerate(ipRange):
+for index,ip in enumerate(ipRange):
+    print(ip)
     #print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
     #makeDHCPRequest(interface, nb, timeOut, debug)
     
@@ -182,5 +185,3 @@ ipRange = netaddr.IPNetwork(subnet).iter_hosts()
 # Futur DHCP server 
 # http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
 
-# Answer analyzing from 
-# https://0xbharath.github.io/art-of-packet-crafting-with-scapy/scapy/sending_recieving/index.html
