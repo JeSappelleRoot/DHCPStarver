@@ -4,13 +4,17 @@ from scapy.all import *
 import re
 
 
-def makeDHCPRequest(ipRequested, interface, nb, timeOut):
+
+def makeDHCPRequest(interface, nb, timeOut, debug):
 # Function to craft simple DHCP discover request
     
     conf.checkIPaddr = False
 
     # Get a random MAC address
     randomMac = RandMAC()
+    #randomMac = generateMacAddress()
+    
+
     # Craft DHCP discover request
     ethernet = Ether(dst='ff:ff:ff:ff:ff:ff', src=randomMac)
     ip       = IP(src ='0.0.0.0', dst='255.255.255.255')
@@ -21,7 +25,12 @@ def makeDHCPRequest(ipRequested, interface, nb, timeOut):
 
     # Send DHCP discover request through specified interface
     for i in range(nb):
-        answer, unanwser = srp(packet,iface = interface, multi = True, verbose = True, timeout = timeOut)
+        # If user choose only 1 retry, don't display "Send packet 1/X"...useless
+        if nb > 1:
+            print(f"Send packet [{i + 1}/{nb}]")
+
+        answer, unanwser = srp(packet,iface = interface, multi = True, verbose = debug, timeout = timeOut)
+
         # If an answer is given, quit the for loop
         # Sometime, Scapy don't receive answer, but Wireshark does...
         if answer:
@@ -31,15 +40,17 @@ def makeDHCPRequest(ipRequested, interface, nb, timeOut):
     if not answer:
         print("[-] No DHCP offer from a DHCP server...")
     # Else if we have an answer from a DHCP server
-    else:
+    elif answer:
         # Loop on the answer, to extract send/receive part
         for snd,rcv in answer:
             # Extract IP of DHCP server
             ipSrv = rcv.sprintf(r"%IP.src%")
             # Extract offered IP
-            ipOffer = rcv.sprintf(r"%IP.dst%"))
+            ipOffer = rcv.sprintf(r"%IP.dst%")
+        # Finally print received DHCP offder
+        print(f"[+] DHCP offer : {ipOffer} (from {ipSrv})")
         
-        # Regex from D@d@ 
+        # Regex from D@d@
         # re.findall('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
         
     return
@@ -73,18 +84,21 @@ interface = 'vboxnet0'
 # Number of request by mac address
 nb = 3
 # Define timeout (in seconds) for each DHCP discover request
-timeOut = 2
+timeOut = 5
 
+# Define a debug variable for Scapy
+debug = False
 
 # Get ip range with netaddr library
 # .iter_host() allow to get only 'hostable' ip
 ipRange = netaddr.IPNetwork(network).iter_hosts()
 
+
 # Simple loop to make DHCP discover request on the IP range
 for index,ip in enumerate(ipRange):
-    print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
-    makeDHCPRequest(ip, interface, nb, timeOut)
-    break
+    #print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
+    makeDHCPRequest(interface, nb, timeOut, debug)
+    
 
 # Futur DHCP server 
 # http://pydhcplib.tuxfamily.org/pmwiki/index.php?n=Site.ServerExample
