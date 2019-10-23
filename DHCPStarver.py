@@ -4,6 +4,25 @@ from scapy.all import *
 import re
 
 
+def displayBanner():
+# With a banner...it's always better !
+
+    # Clear console (Linux command !)
+    os.system('clear')
+
+    print(r"""
+     _____  _    _  _____ _____     _                            
+    |  __ \| |  | |/ ____|  __ \   | |                           
+    | |  | | |__| | |    | |__) |__| |_ __ _ _ ____   _____ _ __ 
+    | |  | |  __  | |    |  ___/ __| __/ _` | '__\ \ / / _ \ '__|
+    | |__| | |  | | |____| |   \__ \ || (_| | |   \ V /  __/ |   
+    |_____/|_|  |_|\_____|_|   |___/\__\__,_|_|    \_/ \___|_|   
+                                                                        
+    """)
+
+    return
+
+# ---------------------------------------------------------------------------------------------------------
 
 def makeDHCPRequest(interface, nb, timeOut, debug):
 # Function to craft simple DHCP discover request
@@ -55,15 +74,21 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
         
     return
 
-# --------------------------------------------------------
-# ------------------------- Main -------------------------
-# --------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
 
+# -----------------------------------------------------------
+#                      ArgsParse section
+# -----------------------------------------------------------
+
+
+
+# Define description about script
 parser = argparse.ArgumentParser(
 
 formatter_class=argparse.RawDescriptionHelpFormatter,
+
 description="""
-DHCPStarver is a tool to perform a DHCP starvation attack with different modes : 
+DHCPStarver is a tool to perform a DHCP starvation attack with different modes : \n
 
 - info mode allow to discover DHCP servers in the network
 - fast mode allow to make a lot of DHCP discover in an short interval
@@ -76,28 +101,53 @@ DHCPStarver is a tool to perform a DHCP starvation attack with different modes :
 """
 )
 
+# Add arguments 
 parser.add_argument('mode', help='Specify mode (info/fast/slow)')
 parser.add_argument('-i', help='Interface used to make DHCP discover (e.g eth0)')
 parser.add_argument('-s', help='Specify a subnet with CIDR notation (e.g 192.168.0.0/24)')
-parser.add_argument('-t', help='Specify timeout for each packet (in seconds)')
-parser.add_argument('-r', help='Number of retry for each packet')
-parser.add_argument('-d', help='Enable scapy debug mode', action="store_true")
+parser.add_argument('-t', help='Specify timeout for each packet (in seconds, default 3)', default=3, type=int)
+parser.add_argument('-r', help='Number of retry for each packet (default 3)', default=3, type=int)
+parser.add_argument('-d', help='Enable scapy debug mode (False if ommited)', action="store_true",default='False')
 
+displayBanner()
 
+# Parse arguments
 args = parser.parse_args()
 
 
+# If no arguments given in command line
+# Print help section
+if len(sys.argv)==1:
+    parser.print_help(sys.stderr)
+    exit()
 
 
 
+
+if args.r < 1:
+    print("\n[!] Number of retries can't be lower than 1")
+    exit()
 
 
 # Define a network in CIDR notation
-network = '10.0.10.0/24'
+subnet = args.s
+
+# Define interface used for dhcp spoofed request
+interface = args.i
+
+# Number of request by mac address
+nb = args.r
+
+# Define timeout (in seconds) for each DHCP discover request
+timeOut = args.t
+
+# Define a debug variable for Scapy
+debug = args.d
+
 
 # Try/Except to avoid error in network notation
 try:
-    netAddress = netaddr.IPNetwork(network,implicit_prefix=False)
+    netAddress = netaddr.IPNetwork(subnet,implicit_prefix=False)
 
     # If the network CIDR is greater or equal to 31
     # /31 allow only 2 hosts in the network
@@ -112,19 +162,15 @@ except netaddr.AddrFormatError as e:
 
 
 
-# Define interface used for dhcp spoofed request
-interface = 'vboxnet0'
-# Number of request by mac address
-nb = 4
-# Define timeout (in seconds) for each DHCP discover request
-timeOut = 6
+# --------------------------------------------------------
+# ------------------------- Main -------------------------
+# --------------------------------------------------------
 
-# Define a debug variable for Scapy
-debug = False
+
 
 # Get ip range with netaddr library
 # .iter_host() allow to get only 'hostable' ip
-ipRange = netaddr.IPNetwork(network).iter_hosts()
+ipRange = netaddr.IPNetwork(subnet).iter_hosts()
 
 
 # Simple loop to make DHCP discover request on the IP range
