@@ -2,6 +2,7 @@ import netaddr
 import argparse
 import netifaces
 from scapy.all import *
+from termcolor import colored
 
 
 
@@ -30,7 +31,7 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
     
     conf.checkIPaddr = False
 
-    if timeOut > 3:
+    if timeOut > 4:
         displayInfo = True
     else:
         displayInfo = False
@@ -46,13 +47,13 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
     dhcp     = DHCP(options=[("message-type","discover"),('end')])
     packet   = ethernet / ip / udp / bootp / dhcp
 
-    print(f"[+] Craft and send frame with {randomMac} mac address")
+    print(colored(f"[+] Craft and send frame with {randomMac} mac address",'yellow'))
 
     # Send DHCP discover request through specified interface
     for i in range(nb):
         # If user choose only 1 retry, don't display "Send packet 1/X"...useless
         if nb > 1 and displayInfo:
-            print(f"Send frame [{i + 1}/{nb}]")
+            print(f"- send frame [{i + 1}/{nb}]")
 
         answer, unanwser = srp(packet,iface = interface, multi = True, verbose = debug, timeout = timeOut)
 
@@ -63,7 +64,7 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
 
     # If no answer received
     if not answer and displayInfo:
-        print("[-] Scapy failed to recover DHCP offer, may be with another sniffer...\n")
+        print(colored("[-] Scapy failed to recover DHCP offer, may be with another sniffer...\n",'red'))
     # Else if we have an answer from a DHCP server
     elif answer and displayInfo:
         # Loop on the answer, to extract send/receive part
@@ -75,7 +76,7 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
             # Extract offered IP
             ipOffer = rcv.sprintf(r"%IP.dst%")
         # Finally print received DHCP offder
-        print(f"[+] DHCP offer : {ipOffer} (from {macSrv} - {ipSrv})\n")
+        print(colored(f"[+] DHCP offer : {ipOffer} (from {macSrv} - {ipSrv})\n",'green'))
         
         # Regex from D@d@
         # re.findall('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
@@ -118,7 +119,7 @@ args = parser.parse_args()
 
 # If no arguments given in command line
 # Print help section
-if len(sys.argv)==1:
+if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
     exit()
 
@@ -138,7 +139,7 @@ debug = args.d
 
 # Check if interface exist in the host
 if interface not in netifaces.interfaces():
-    print(f"[!] Interface {interface} don't exist")
+    print(colored(f"[!] Interface {interface} don't exist",'red'))
     exit()
 
 
@@ -150,13 +151,12 @@ try:
     # /31 allow only 2 hosts in the network
     # /32 don't allow any hosts in network...
     if netAddress.prefixlen >= 31:
-        print("[!] Please specify a CIDR lower than 31 or 32")
+        print(colored("[!] Please specify a CIDR lower than 31 or 32",'red'))
         exit()
 except netaddr.AddrFormatError as e:
-    print("[!] Please specify a valid network address : ")
-    print(f"[!] {e}")
+    print(colored("[!] Please specify a valid network address : ",'red'))
+    print(colored(f"[!] {e}",'red'))
     exit()
-
 
 
 # --------------------------------------------------------
