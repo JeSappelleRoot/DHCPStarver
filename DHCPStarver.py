@@ -82,9 +82,9 @@ except netaddr.AddrFormatError as e:
 # Define interface used for dhcp spoofed request
 interface = 'vboxnet0'
 # Number of request by mac address
-nb = 3
+nb = 4
 # Define timeout (in seconds) for each DHCP discover request
-timeOut = 5
+timeOut = 6
 
 # Define a debug variable for Scapy
 debug = False
