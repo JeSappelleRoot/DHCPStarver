@@ -59,6 +59,39 @@ def makeDHCPRequest(interface, nb, timeOut, debug):
 # ------------------------- Main -------------------------
 # --------------------------------------------------------
 
+parser = argparse.ArgumentParser(
+
+formatter_class=argparse.RawDescriptionHelpFormatter,
+description="""
+DHCPStarver is a tool to perform a DHCP starvation attack with different modes : 
+
+- info mode allow to discover DHCP servers in the network
+- fast mode allow to make a lot of DHCP discover in an short interval
+- slow mode wait answers from DHCP servers and provide more informations about DHCP offers
+
+# -------------------------------- #
+#  For educationnal purposes only  #
+# -------------------------------- #
+
+"""
+)
+
+parser.add_argument('mode', help='Specify mode (info/fast/slow)')
+parser.add_argument('-i', help='Interface used to make DHCP discover (e.g eth0)')
+parser.add_argument('-s', help='Specify a subnet with CIDR notation (e.g 192.168.0.0/24)')
+parser.add_argument('-t', help='Specify timeout for each packet (in seconds)')
+parser.add_argument('-r', help='Number of retry for each packet')
+parser.add_argument('-d', help='Enable scapy debug mode', action="store_true")
+
+
+args = parser.parse_args()
+
+
+
+
+
+
+
 # Define a network in CIDR notation
 network = '10.0.10.0/24'
 
@@ -95,9 +128,9 @@ ipRange = netaddr.IPNetwork(network).iter_hosts()
 
 
 # Simple loop to make DHCP discover request on the IP range
-for index,ip in enumerate(ipRange):
+#for index,ip in enumerate(ipRange):
     #print(f"[+] DHCP discover {index + 1}/{len(list(ipRange))}")
-    makeDHCPRequest(interface, nb, timeOut, debug)
+    #makeDHCPRequest(interface, nb, timeOut, debug)
     
 
 # Futur DHCP server 
