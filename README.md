@@ -17,7 +17,11 @@ DHCPstarver use differents libraries :
 ## Requirement file
 
 ```
-Requirement file HERE
+netaddr==0.7.19
+argparse==1.2.1
+netifaces==0.10.4
+scapy==2.4.3
+termcolor==1.1.0
 ```
 
 
