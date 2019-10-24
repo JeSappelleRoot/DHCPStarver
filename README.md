@@ -1,3 +1,13 @@
+
+
+# DHCPStarver
+
+
+DHCPstarver is a tool to perform a DHCP starvation attack.
+
+**This tool is designed for educational purposes only**
+
+
 - [DHCPStarver](#dhcpstarver)
 - [Requirements](#requirements)
   - [Requirement file](#requirement-file)
@@ -14,12 +24,8 @@
 
 
 
-# DHCPStarver
 
 
-DHCPstarver is a tool to perform a DHCP starvation attack.
-
-**This tool is designed for educational purposes only**
 
 # Requirements
 
