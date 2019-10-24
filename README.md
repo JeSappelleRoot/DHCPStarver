@@ -23,9 +23,7 @@ DHCPstarver is a tool to perform a DHCP starvation attack.
   - [fast mode](#fast-mode)
     - [Exemple](#exemple-1)
 - [How to test DHCPstarver on your own DHCP server](#how-to-test-dhcpstarver-on-your-own-dhcp-server)
-
-
-
+- [Side of a DHCP server](#side-of-a-dhcp-server)
 
 
 
@@ -211,5 +209,21 @@ With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24`
 On your favorite Linux distribution, you can install **isc-dhcp-server**  
 On a Debian distrib, just run `apt-get install isc-dhcp-server` to install it
 
+# Side of a DHCP server 
 
+If the starvaton attack is completed, DHCP server logs looks like : 
 
+```
+root@dhcpSRV:/var/log# tail -f syslog|grep --color dhcpd
+
+Oct 24 13:36:23 dhcpSRV dhcpd[414]: DHCPDISCOVER from 30:65:3a:31:62:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:23 dhcpSRV dhcpd[414]: DHCPDISCOVER from 66:35:3a:36:31:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:23 dhcpSRV dhcpd[414]: DHCPDISCOVER from 34:30:3a:30:31:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:23 dhcpSRV dhcpd[414]: DHCPDISCOVER from 63:39:3a:37:32:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:23 dhcpSRV dhcpd[414]: DHCPDISCOVER from 36:31:3a:31:33:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:23 dhcpSRV dhcpd[414]: DHCPDISCOVER from 63:36:3a:32:63:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 36:37:3a:38:65:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 62:32:3a:65:62:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 32:65:3a:30:65:3a via enp0s3: network 10.0.10.0/24: no free leases
+Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 61:61:3a:37:30:3a via enp0s3: network 10.0.10.0/24: no free leases
+```
