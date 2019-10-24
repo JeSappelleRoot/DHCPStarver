@@ -92,7 +92,7 @@ Sometimes, Scapy doesn't seem to receive DHCP offers, but can be view with a sta
 
 ### Exemple
 
-With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24 -t 5 -r 3`
+With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24 -t 5 -r 3` : 
 
 ```
      _____  _    _  _____ _____     _                            
@@ -138,7 +138,7 @@ The fast can be used with :
 
 ### Exemple 
 
-With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24`
+With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24` : 
 
 ```
 
