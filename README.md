@@ -22,7 +22,7 @@ DHCPstarver is a tool to perform a DHCP starvation attack.
     - [Exemple](#exemple)
   - [fast mode](#fast-mode)
     - [Exemple](#exemple-1)
-- [How to test DHCPstarver on your own DHCP server](#how-to-test-dhcpstarver-on-your-own-dhcp-server)
+- [How to test DHCPstarver on your own DHCP server (**virtual machine here**)](#how-to-test-dhcpstarver-on-your-own-dhcp-server-virtual-machine-here)
 - [Side of a DHCP server](#side-of-a-dhcp-server)
 
 
@@ -204,10 +204,33 @@ With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24`
 [...]
 ```
 
-# How to test DHCPstarver on your own DHCP server
+# How to test DHCPstarver on your own DHCP server (**virtual machine here**)
 
 On your favorite Linux distribution, you can install **isc-dhcp-server**  
 On a Debian distrib, just run `apt-get install isc-dhcp-server` to install it
+
+**In /etc/dhcp/dhcpd.conf**, set the content like : 
+
+```
+default-lease-time 600;
+max-lease-time 7200;
+
+subnet 10.0.10.0 netmask 255.255.255.0 {
+
+        range 10.0.10.100 10.0.10.200;
+        option broadcast-address 10.0.10.255;
+        option routers 10.0.10.254;
+
+}
+```
+This content create a DHCP pool for 10.0.10.0/24 subnet :  
+- IP pool start at 10.0.10.100  
+- IP pool end at 10.0.10.200
+- Broadcast address is 10.0.10.255  
+- The default gateway will be 10.0.10.254
+
+**In /etc/default/isc-dhcp-server**, set the value `INTERFACESv4=""` with your interface where your DHCP server will listen requests.  
+In my case, the value is `INTERFACESv4="enp0s3"` (depend of your context)
 
 # Side of a DHCP server 
 
@@ -226,4 +249,8 @@ Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 36:37:3a:38:65:3a via enp0
 Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 62:32:3a:65:62:3a via enp0s3: network 10.0.10.0/24: no free leases
 Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 32:65:3a:30:65:3a via enp0s3: network 10.0.10.0/24: no free leases
 Oct 24 13:36:24 dhcpSRV dhcpd[414]: DHCPDISCOVER from 61:61:3a:37:30:3a via enp0s3: network 10.0.10.0/24: no free leases
+
+[...]
 ```
+
+At this time, a client can be request any IP address
