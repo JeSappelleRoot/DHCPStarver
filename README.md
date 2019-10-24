@@ -69,6 +69,22 @@ DHCPstarver needs some arguments :
 
 - `-d` to make Scapy more verbose, it only add `verbose = True` in Scapy crafted requests
 
+# How DHCPstarver make DHCP discover
+
+DHCP discover is the first request of an host when no IP address is set.  
+The client craft a request with :   
+
+**At layer 2**  
+- hardware MAC address source (random mac with DHCPstarver, *with RandMAC() function in Scapy*)  
+- ff:ff:ff:ff:ff:ff destination MAC address (broadcast address for 2nd layer)
+
+**At layer 3**
+- 0.0.0.0 source IP address  
+- 255.255.255.255 destination IP address (broadcast for 3rd layer)
+
+
+
+
 # Differents modes of use
 
 DHCPstarver can be used in fast or slow and more verbose mode.  
