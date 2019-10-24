@@ -59,7 +59,7 @@ DHCPstarver needs some arguments :
 - `-i` to specify interface which will be use to make DHCP discover request  
   DHCPstarver check if the interface exist before make request
 
-- `-s` to specify a subnet  
+- `-s` to specify a subnet, **with CIDR notation**  
   A DHCP discover request implies that the client doesn't have a IP address yet, **but the subnet will be used to loop on each available IP address availables in a DHCP server**
 
 - `-t` to add a specific timeout for each DHCP discover request (**default is 0**)  
@@ -92,8 +92,42 @@ Sometimes, Scapy doesn't seem to receive DHCP offers, but can be view with a sta
 
 ### Exemple
 
+With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24 -t 5 -r 3`
+
 ```
-Capture d'écran du slow mode ICI
+     _____  _    _  _____ _____     _                            
+    |  __ \| |  | |/ ____|  __ \   | |                           
+    | |  | | |__| | |    | |__) |__| |_ __ _ _ ____   _____ _ __ 
+    | |  | |  __  | |    |  ___/ __| __/ _` | '__\ \ / / _ \ '__|
+    | |__| | |  | | |____| |   \__ \ || (_| | |   \ V /  __/ |   
+    |_____/|_|  |_|\_____|_|   |___/\__\__,_|_|    \_/ \___|_|   
+                                                                        
+    
+[+] Craft and send frame with 73:81:34:af:8f:fe mac address
+- send frame [1/3]
+[+] DHCP offer : 10.0.10.180 (from 08:00:27:00:8c:ce - 10.0.10.10)
+
+[+] Craft and send frame with f9:f1:ee:0c:b0:f4 mac address
+- send frame [1/3]
+[+] DHCP offer : 10.0.10.181 (from 08:00:27:00:8c:ce - 10.0.10.10)
+
+[+] Craft and send frame with e0:c5:a7:bb:98:38 mac address
+- send frame [1/3]
+- send frame [2/3]
+- send frame [3/3]
+[-] Scapy failed to recover DHCP offer, may be with another sniffer...
+
+[+] Craft and send frame with 4e:c3:fe:ac:f5:02 mac address
+- send frame [1/3]
+- send frame [2/3]
+- send frame [3/3]
+[-] Scapy failed to recover DHCP offer, may be with another sniffer...
+
+[+] Craft and send frame with e5:02:46:3d:3d:a4 mac address
+- send frame [1/3]
+[+] DHCP offer : 10.0.10.188 (from 08:00:27:00:8c:ce - 10.0.10.10)
+
+[...]
 ```
 
 ## fast mode
@@ -104,8 +138,32 @@ The fast can be used with :
 
 ### Exemple 
 
+With command line `sudo python3 DHCPStarver.py -i vboxnet0 -r 3 -s 10.0.10.0/24`
+
 ```
-Capture d'écran du slow mode ICI
+
+     _____  _    _  _____ _____     _                            
+    |  __ \| |  | |/ ____|  __ \   | |                           
+    | |  | | |__| | |    | |__) |__| |_ __ _ _ ____   _____ _ __ 
+    | |  | |  __  | |    |  ___/ __| __/ _` | '__\ \ / / _ \ '__|
+    | |__| | |  | | |____| |   \__ \ || (_| | |   \ V /  __/ |   
+    |_____/|_|  |_|\_____|_|   |___/\__\__,_|_|    \_/ \___|_|   
+                                                                        
+    
+[+] Craft and send frame with 4d:f0:3a:fa:ca:4b mac address
+[+] Craft and send frame with c3:ab:d6:82:4d:d6 mac address
+[+] Craft and send frame with fa:7d:53:4c:e6:24 mac address
+[+] Craft and send frame with 29:d8:93:c5:16:28 mac address
+[+] Craft and send frame with 14:fe:ad:5b:00:ca mac address
+[+] Craft and send frame with 94:04:0e:e8:17:92 mac address
+[+] Craft and send frame with c7:6e:bc:62:3f:56 mac address
+[+] Craft and send frame with 8a:b8:a9:4b:b0:47 mac address
+[+] Craft and send frame with 0c:db:96:03:c6:e8 mac address
+[+] Craft and send frame with 4a:f0:38:98:14:fd mac address
+[+] Craft and send frame with 74:a9:87:14:9e:ba mac address
+[+] Craft and send frame with d4:81:9d:1f:a3:da mac address
+
+[...]
 ```
 
 # How to test DHCPstarver on your own DHCP server
