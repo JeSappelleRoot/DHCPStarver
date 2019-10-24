@@ -23,7 +23,7 @@ DHCPstarver is a tool to perform a DHCP starvation attack.
   - [fast mode](#fast-mode)
     - [Exemple](#exemple-1)
 - [How to test DHCPstarver on your own DHCP server (**virtual machine here**)](#how-to-test-dhcpstarver-on-your-own-dhcp-server-virtual-machine-here)
-- [Side of a DHCP server](#side-of-a-dhcp-server)
+  - [Side of a DHCP server](#side-of-a-dhcp-server)
 
 
 
@@ -232,7 +232,9 @@ This content create a DHCP pool for 10.0.10.0/24 subnet :
 **In /etc/default/isc-dhcp-server**, set the value `INTERFACESv4=""` with your interface where your DHCP server will listen requests.  
 In my case, the value is `INTERFACESv4="enp0s3"` (depend of your context)
 
-# Side of a DHCP server 
+Finally, use `service isc-dhcp-server` command to start your DHCP server
+
+## Side of a DHCP server 
 
 If the starvaton attack is completed, DHCP server logs looks like : 
 
