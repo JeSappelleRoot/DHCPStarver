@@ -1,3 +1,4 @@
+import sys
 import netaddr
 import argparse
 import netifaces
