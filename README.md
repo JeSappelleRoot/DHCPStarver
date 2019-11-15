@@ -5,9 +5,9 @@
 
 DHCPstarver is a tool to perform a DHCP starvation attack.
 
-`#######################################################`  
+`########################################################`  
 `#` **This tool is designed for educational purposes only** `#`  
-`#######################################################`  
+`########################################################`  
 
 
 - [DHCPStarver](#dhcpstarver)
