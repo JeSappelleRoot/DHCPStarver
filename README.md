@@ -71,7 +71,9 @@ https://cabeggar.github.io/2016/02/21/DHCP-starvation-with-ScaPy/
 
 Thanks to D@da for his regex (unfortunately not used), but appreciated it !   
 
-`re.findall('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))`
+```python
+re.findall('([0-9]*.[0-9]*.[0-9]*.[0-9]*):bootpc /', str(answer))
+```
 
 *View the end of makeDHCPRequest() function*
 
