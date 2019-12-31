@@ -5,9 +5,9 @@
 
 DHCPstarver is a tool to perform a DHCP starvation attack.
 
-`########################################################`  
+`####################################################`  
 `#` **This tool is designed for educational purposes only** `#`  
-`########################################################`  
+`####################################################`  
 
 
 - [DHCPStarver](#dhcpstarver)
@@ -22,7 +22,7 @@ DHCPstarver is a tool to perform a DHCP starvation attack.
     - [Exemple](#exemple)
   - [fast mode](#fast-mode)
     - [Exemple](#exemple-1)
-- [How to test DHCPstarver on your own DHCP server (**virtual machine here**)](#how-to-test-dhcpstarver-on-your-own-dhcp-server-virtual-machine-here)
+- [How to test DHCPstarver on your own DHCP server (virtual machine here)](#how-to-test-dhcpstarver-on-your-own-dhcp-server-virtual-machine-here)
   - [Side of a DHCP server](#side-of-a-dhcp-server)
 
 
